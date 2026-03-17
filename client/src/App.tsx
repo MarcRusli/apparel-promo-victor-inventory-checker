@@ -75,7 +75,9 @@ export default function App() {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch("/api/search", {
+      const apiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined) || "";
+      const base = apiBase.endsWith("/") ? apiBase.slice(0, -1) : apiBase;
+      const res = await fetch(`${base}/api/search`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(counts)
