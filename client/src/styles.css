@@ -106,6 +106,63 @@ body {
   margin: 6px 0;
 }
 
+.faq {
+  margin: 0 0 12px;
+  border: 2px solid rgba(47, 140, 255, 0.35);
+  border-radius: 16px;
+  background: rgba(47, 140, 255, 0.08);
+  padding: 14px 14px 12px;
+}
+
+.faq > summary {
+  cursor: pointer;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  list-style: none;
+}
+
+.faqTip {
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.faq > summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq[open] > summary {
+  margin-bottom: 10px;
+}
+
+.faqList {
+  margin-top: 10px;
+  display: grid;
+  gap: 10px;
+}
+
+.faqItem {
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(7, 26, 58, 0.25);
+  padding: 10px 12px;
+}
+
+.faqItem summary {
+  cursor: pointer;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.faqBody {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.45;
+}
+
 .sizesRow {
   display: flex;
   align-items: center;

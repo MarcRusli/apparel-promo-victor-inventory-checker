@@ -1,6 +1,16 @@
 import React, { useMemo, useState } from "react";
 
-const SIZES = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "XXXXL"] as const;
+const SIZES = [
+  "XXS",
+  "XS",
+  "S",
+  "M",
+  "L",
+  "XL",
+  "XXL",
+  "XXXL",
+  "XXXXL",
+] as const;
 type Size = (typeof SIZES)[number];
 
 type Item = { category: string; model: string };
@@ -14,7 +24,7 @@ const DISPLAY_SIZE_LABEL: Record<Size, string> = {
   XL: "XL",
   XXL: "2XL",
   XXXL: "3XL",
-  XXXXL: "4XL"
+  XXXXL: "4XL",
 };
 
 function clampInt(n: number): number {
@@ -24,8 +34,8 @@ function clampInt(n: number): number {
 }
 
 export default function App() {
-  const [counts, setCounts] = useState<Record<Size, number>>(() =>
-    Object.fromEntries(SIZES.map((s) => [s, 0])) as Record<Size, number>
+  const [counts, setCounts] = useState<Record<Size, number>>(
+    () => Object.fromEntries(SIZES.map((s) => [s, 0])) as Record<Size, number>,
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +44,7 @@ export default function App() {
 
   const requestedTotal = useMemo(
     () => Object.values(counts).reduce((sum, n) => sum + clampInt(n), 0),
-    [counts]
+    [counts],
   );
 
   const sortedItems = useMemo(() => {
@@ -75,17 +85,19 @@ export default function App() {
     setError(null);
     setLoading(true);
     try {
-      const apiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined) || "";
+      const apiBase =
+        (import.meta.env.VITE_API_BASE_URL as string | undefined) || "";
       const base = apiBase.endsWith("/") ? apiBase.slice(0, -1) : apiBase;
       const res = await fetch(`${base}/api/search`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(counts)
+        body: JSON.stringify(counts),
       });
       const data = (await res.json()) as
         | { items: Item[]; fetchedAt: number }
         | { error: string };
-      if (!res.ok) throw new Error("error" in data ? data.error : "Search failed");
+      if (!res.ok)
+        throw new Error("error" in data ? data.error : "Search failed");
       if ("error" in data) throw new Error(data.error);
       setItems(data.items);
     } catch (err) {
@@ -103,20 +115,49 @@ export default function App() {
           <div className="badge">Apparel Promo's</div>
           <h1>Victor Apparel Inventory Checker</h1>
           <p>
-            Tired of asking the Apparel Promo team for inventory checks? Use this tool to quickly find models that meet your sizing requirements.
+            Tired of asking the Apparel Promo team for inventory checks? Use
+            this tool to quickly find models that meet your sizing requirements.
           </p>
         </header>
 
         <section className="howto" aria-label="How to use">
           <h2>How to use</h2>
           <ol className="howtoList">
-            <li>Enter the minimum quantity you need for each size (leave a size at 0 to ignore it).</li>
-            <li>Click <strong>Search</strong>.</li>
+            <li>
+              Enter the minimum quantity you need for each size (leave a size at
+              0 to ignore it).
+            </li>
+            <li>
+              Click <strong>Search</strong>.
+            </li>
             <li>Review the matches list (sorted by category).</li>
-            <li>Click <strong>Copy</strong> to copy a model number to your clipboard.</li>
-            <li>Paste the model number into your search engine (probably Google) to see what the item looks like.</li>
+            <li>
+              Click <strong>Copy</strong> to copy a model number to your
+              clipboard.
+            </li>
+            <li>
+              Paste the model number into your search engine (probably Google)
+              to see what the item looks like.
+            </li>
           </ol>
         </section>
+
+        <details className="faq" aria-label="FAQ">
+          <summary>
+            FAQ <span className="faqTip">(click to expand)</span>
+          </summary>
+          <div className="faqList">
+            <details className="faqItem">
+              <summary>Why aren't there pictures?</summary>
+              <div className="faqBody">
+                Unfortunately Victor's inventory sheet doesn't include images,
+                and Victor's official website doesn't display everything they
+                have in stock. Your best bet is to copy the model number and
+                search for it online to find pictures and more details.
+              </div>
+            </details>
+          </div>
+        </details>
 
         <section className="card">
           <form onSubmit={onSearch} className="form">
@@ -173,10 +214,15 @@ export default function App() {
           ) : (
             <div className="list">
               {sortedItems.map((it, idx) => (
-                <article key={`${it.category}:${it.model}:${idx}`} className="item">
+                <article
+                  key={`${it.category}:${it.model}:${idx}`}
+                  className="item"
+                >
                   <div className="itemTop">
                     <div>
-                      <div className="cat">{it.category || "Uncategorized"}</div>
+                      <div className="cat">
+                        {it.category || "Uncategorized"}
+                      </div>
                       <div className="model">{it.model || "(no model)"}</div>
                     </div>
                     <button
@@ -187,16 +233,27 @@ export default function App() {
                           await copyToClipboard(it.model || "");
                           const key = `${it.category}:${it.model}:${idx}`;
                           setCopiedKey(key);
-                          window.setTimeout(() => setCopiedKey((k) => (k === key ? null : k)), 900);
+                          window.setTimeout(
+                            () => setCopiedKey((k) => (k === key ? null : k)),
+                            900,
+                          );
                         } catch (err) {
-                          setError(err instanceof Error ? err.message : "Copy failed");
+                          setError(
+                            err instanceof Error ? err.message : "Copy failed",
+                          );
                         }
                       }}
                       disabled={!it.model}
                       aria-label={`Copy model ${it.model}`}
-                      title={it.model ? "Copy model to clipboard" : "No model to copy"}
+                      title={
+                        it.model
+                          ? "Copy model to clipboard"
+                          : "No model to copy"
+                      }
                     >
-                      {copiedKey === `${it.category}:${it.model}:${idx}` ? "Copied" : "Copy"}
+                      {copiedKey === `${it.category}:${it.model}:${idx}`
+                        ? "Copied"
+                        : "Copy"}
                     </button>
                   </div>
                 </article>
