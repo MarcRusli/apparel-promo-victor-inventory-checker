@@ -37,7 +37,11 @@ app.post("/api/search", async (req, res) => {
 
     res.json({
       fetchedAt,
-      items: matched.map((it) => ({ category: it.category, model: it.model }))
+      items: matched.map((it) => ({
+        category: it.category,
+        model: it.model,
+        specialSizing: it.specialSizing
+      }))
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";

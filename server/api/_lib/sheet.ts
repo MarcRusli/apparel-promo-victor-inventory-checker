@@ -4,6 +4,7 @@ import { SIZES, type Size } from "./sizes.js";
 export type SheetItem = {
   category: string;
   model: string;
+  specialSizing: string;
   sizes: Record<Size, number>;
 };
 
@@ -20,6 +21,7 @@ export type SheetFetchDebug = {
   columnIndexes: {
     category: number;
     model: number;
+    specialSizing: number;
     sizes: Record<string, number>;
     fallbackUsed: boolean;
   };
@@ -57,6 +59,10 @@ function parseNumber(value: unknown): number {
   if (!text) return 0;
   const n = Number(text.replaceAll(",", ""));
   return Number.isFinite(n) ? n : 0;
+}
+
+function parseSpecialSizing(value: unknown): string {
+  return normalizeKey(value) || "Unisex";
 }
 
 function requireEnv(name: string): string | null {
@@ -129,6 +135,7 @@ function findHeaderRowIndex(rows: string[][]): number {
 function buildIndexFromHeaderRow(headerRow: string[]): {
   categoryIdx: number;
   modelIdx: number;
+  specialSizingIdx: number;
   sizeIdxs: Record<Size, number>;
   fallbackUsed: boolean;
 } {
@@ -140,6 +147,7 @@ function buildIndexFromHeaderRow(headerRow: string[]): {
 
   const categoryIdx = lowerToIndex.get("category") ?? -1;
   const modelIdx = lowerToIndex.get("model") ?? -1;
+  const specialSizingIdx = lowerToIndex.get("special sizing") ?? -1;
 
   const sizeIdxs = Object.fromEntries(SIZES.map((s) => [s, -1])) as Record<Size, number>;
   for (let i = 0; i < headerRow.length; i++) {
@@ -158,7 +166,7 @@ function buildIndexFromHeaderRow(headerRow: string[]): {
     }
   }
 
-  return { categoryIdx, modelIdx, sizeIdxs, fallbackUsed };
+  return { categoryIdx, modelIdx, specialSizingIdx, sizeIdxs, fallbackUsed };
 }
 
 export async function getSheetItems(opts?: { force?: boolean }): Promise<Cache> {
@@ -185,13 +193,14 @@ export async function getSheetItems(opts?: { force?: boolean }): Promise<Cache> 
       const row = rows[i] ?? [];
       const category = normalizeKey(row[idx.categoryIdx] ?? "");
       const model = normalizeKey(row[idx.modelIdx] ?? "");
+      const specialSizing = parseSpecialSizing(row[idx.specialSizingIdx] ?? "");
       if (!category && !model) continue;
 
       const sizes: Record<Size, number> = Object.fromEntries(
         SIZES.map((s) => [s, parseNumber(row[idx.sizeIdxs[s] ?? -1])])
       ) as Record<Size, number>;
 
-      items.push({ category, model, sizes });
+      items.push({ category, model, specialSizing, sizes });
     }
 
     const next: Cache = { fetchedAt: Date.now(), items };
@@ -236,11 +245,12 @@ export async function debugSheetFetch(): Promise<SheetFetchDebug> {
       const row = rows[i] ?? [];
       const category = normalizeKey(row[idx.categoryIdx] ?? "");
       const model = normalizeKey(row[idx.modelIdx] ?? "");
+      const specialSizing = parseSpecialSizing(row[idx.specialSizingIdx] ?? "");
       if (!category && !model) continue;
       const sizes: Record<Size, number> = Object.fromEntries(
         SIZES.map((s) => [s, parseNumber(row[idx.sizeIdxs[s] ?? -1])])
       ) as Record<Size, number>;
-      mapped.push({ category, model, sizes });
+      mapped.push({ category, model, specialSizing, sizes });
     }
   }
 
@@ -257,6 +267,7 @@ export async function debugSheetFetch(): Promise<SheetFetchDebug> {
     columnIndexes: {
       category: idx?.categoryIdx ?? -1,
       model: idx?.modelIdx ?? -1,
+      specialSizing: idx?.specialSizingIdx ?? -1,
       sizes: Object.fromEntries(SIZES.map((s) => [s, idx?.sizeIdxs[s] ?? -1])),
       fallbackUsed: idx?.fallbackUsed ?? false
     },

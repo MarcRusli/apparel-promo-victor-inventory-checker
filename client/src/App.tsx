@@ -13,7 +13,7 @@ const SIZES = [
 ] as const;
 type Size = (typeof SIZES)[number];
 
-type Item = { category: string; model: string };
+type Item = { category: string; model: string; specialSizing: string };
 
 const DISPLAY_SIZE_LABEL: Record<Size, string> = {
   XXS: "2XS",
@@ -220,8 +220,13 @@ export default function App() {
                 >
                   <div className="itemTop">
                     <div>
-                      <div className="cat">
-                        {it.category || "Uncategorized"}
+                      <div className="itemMeta">
+                        <div className="cat">
+                          {it.category || "Uncategorized"}
+                        </div>
+                        <div className="specialSizing">
+                          {it.specialSizing || "Unisex"}
+                        </div>
                       </div>
                       <div className="model">{it.model || "(no model)"}</div>
                     </div>

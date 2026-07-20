@@ -22,7 +22,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     res.status(200).json({
       fetchedAt,
-      items: matched.map((it) => ({ category: it.category, model: it.model }))
+      items: matched.map((it) => ({
+        category: it.category,
+        model: it.model,
+        specialSizing: it.specialSizing
+      }))
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
