@@ -33,6 +33,13 @@ function clampInt(n: number): number {
   return Math.floor(n);
 }
 
+function specialSizingClass(value: string): string {
+  const key = value.trim().toLowerCase();
+  if (key === "female") return "specialSizing specialSizingFemale";
+  if (key === "junior") return "specialSizing specialSizingJunior";
+  return "specialSizing";
+}
+
 export default function App() {
   const [counts, setCounts] = useState<Record<Size, number>>(
     () => Object.fromEntries(SIZES.map((s) => [s, 0])) as Record<Size, number>,
@@ -224,7 +231,11 @@ export default function App() {
                         <div className="cat">
                           {it.category || "Uncategorized"}
                         </div>
-                        <div className="specialSizing">
+                        <div
+                          className={specialSizingClass(
+                            it.specialSizing || "Unisex",
+                          )}
+                        >
                           {it.specialSizing || "Unisex"}
                         </div>
                       </div>

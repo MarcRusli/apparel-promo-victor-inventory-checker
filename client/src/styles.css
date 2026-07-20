@@ -349,6 +349,16 @@ body {
   text-transform: uppercase;
 }
 
+.specialSizingFemale {
+  border-color: rgba(255, 105, 180, 0.62);
+  background: rgba(255, 105, 180, 0.18);
+}
+
+.specialSizingJunior {
+  border-color: rgba(54, 211, 153, 0.62);
+  background: rgba(54, 211, 153, 0.18);
+}
+
 .model {
   margin-top: 6px;
   font-size: 18px;
